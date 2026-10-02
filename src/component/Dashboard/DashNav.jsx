@@ -242,7 +242,7 @@ const DashNav = () => {
                                             scale: 0.97,
                                         }}
                                         transition={{ duration: 0.2 }}
-                                        className="absolute right-0 mt-3 w-[310px] overflow-hidden bg-white shadow-2xl shadow-violet-200/50 ring-1 ring-violet-100"
+                                        className="absolute right-0 mt-3 w-[310px] max-w-[calc(100vw-2rem)] overflow-hidden bg-white shadow-2xl shadow-violet-200/50 ring-1 ring-violet-100"
                                     >
 
                                         <div className="h-1 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500" />

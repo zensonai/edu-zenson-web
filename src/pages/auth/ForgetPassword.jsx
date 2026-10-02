@@ -30,7 +30,7 @@ const ForgetPassword = () => {
         catch (err) {
             setToast({
                 success: false,
-                message: res.data.message || "Something went wrong",
+                message: err.response?.data?.message || "Something went wrong",
             });
         }
         finally {

@@ -1,9 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { FaEye, FaMagnifyingGlass } from 'react-icons/fa6'
 import API from '../../../../services/api'
+import { useAuth } from '../../../../context/AuthContext'
 
 const Students = () => {
     const token = localStorage.getItem('access_token')
+    const { auth } = useAuth()
+    const canViewInstitutionList = auth.user?.role === 'INSTITUTE_ADMIN'
+    const [loadError, setLoadError] = useState('')
     const [students, setStudents] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
     const [search, setSearch] = useState('')
@@ -28,19 +32,24 @@ const Students = () => {
 
     useEffect(() => {
         const fectchstudents = async () => {
-            const res = await API.get('/student/institute-students', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            try {
+                setLoadError('')
+                const res = await API.get('/student/institute-students', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
 
-            if (res.data.success === true) {
-                setStudents(res.data.result)
+                if (res.data.success === true) {
+                    setStudents(res.data.result)
+                }
+            } catch (err) {
+                setLoadError(err.response?.data?.message || 'Unable to load students. Please try again.')
             }
         }
 
-        if (token) fectchstudents()
-    }, [token])
+        if (token && canViewInstitutionList) fectchstudents()
+    }, [token, canViewInstitutionList])
 
     useEffect(() => {
         setCurrentPage(1)
@@ -51,6 +60,19 @@ const Students = () => {
             setCurrentPage(totalPages)
         }
     }, [currentPage, totalPages])
+
+    if (!canViewInstitutionList || loadError) {
+        return (
+            <div className="w-full bg-white p-3 sm:p-4">
+                <h1 className="text-xl font-black tracking-tight text-violet-950">Students</h1>
+                <p role="alert" className="mt-4 text-sm text-slate-600">
+                    {!canViewInstitutionList
+                        ? 'Students lists are available to institution administrators. Sign in with an institution administrator account to view its students.'
+                        : loadError}
+                </p>
+            </div>
+        )
+    }
 
     return (
         <div className="w-full bg-white p-3 sm:p-4">

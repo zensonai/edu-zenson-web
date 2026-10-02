@@ -4,25 +4,40 @@ import { FaUserGraduate, FaEnvelope, FaIdCard, FaCircleCheck } from 'react-icons
 import API from '../../../../services/api'
 
 const ViewMyStudent = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
     const token = localStorage.getItem('access_token')
     const [student, setStudent] = useState(null)
 
     useEffect(() => {
         const fetchstudent = async () => {
-            const res = await API.get(`/student/my-student/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            setLoadError('')
+            try {
+                const res = await API.get(`/student/my-student/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
 
-            if (res.data.success === true) {
-                setStudent(res.data.result)
+                if (res.data.success === true) {
+                    setStudent(res.data.result)
+                }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
             }
         }
 
         if (token && id) fetchstudent()
     }, [token, id])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     if (!student) {
         return (

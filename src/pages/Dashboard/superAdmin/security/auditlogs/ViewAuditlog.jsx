@@ -19,6 +19,7 @@ import {
 import API from '../../../../../services/api'
 
 const ViewAuditlog = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
     const token = localStorage.getItem('access_token')
     const [auditlog, setAuditlog] = useState('')
@@ -26,19 +27,24 @@ const ViewAuditlog = () => {
 
     useEffect(() => {
         const fetchauditlog = async () => {
+            setLoadError('')
             setLoading(true)
+            try {
+                const res = await API.get(`/admin/auditlog-by-id/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
 
-            const res = await API.get(`/admin/auditlog-by-id/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+                if (res.data.success === true) {
+                    setAuditlog(res.data.result)
                 }
-            })
-
-            if (res.data.success === true) {
-                setAuditlog(res.data.result)
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
+            } finally {
+                setLoading(false)
             }
-
-            setLoading(false)
         }
 
         if (token) fetchauditlog()
@@ -100,6 +106,14 @@ const ViewAuditlog = () => {
         }
 
         return 'bg-cyan-50 text-cyan-700 ring-cyan-100'
+    }
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
     }
 
     if (loading) {

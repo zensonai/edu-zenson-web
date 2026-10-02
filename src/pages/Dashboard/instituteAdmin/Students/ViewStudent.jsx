@@ -11,6 +11,7 @@ import {
 import API from '../../../../services/api'
 
 const ViewStudent = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
     const token = localStorage.getItem('access_token')
     const [student, setStudent] = useState(null)
@@ -18,21 +19,36 @@ const ViewStudent = () => {
 
     useEffect(() => {
         const fetchstudentdata = async () => {
-            const res = await API.get(`/student/institute-student/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            setLoadError('')
+            setLoading(true)
+            try {
+                const res = await API.get(`/student/institute-student/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
 
-            if (res.data.success === true) {
-                setStudent(res.data.result)
+                if (res.data.success === true) {
+                    setStudent(res.data.result)
+                }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
+            } finally {
+                setLoading(false)
             }
-
-            setLoading(false)
         }
 
         if (token) fetchstudentdata()
     }, [token, id])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     if (loading) {
         return (

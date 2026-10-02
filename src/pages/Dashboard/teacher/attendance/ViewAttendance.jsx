@@ -11,6 +11,7 @@ import {
 import API from '../../../../services/api'
 
 const ViewAttendance = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
 
     const token = localStorage.getItem('access_token')
@@ -18,24 +19,39 @@ const ViewAttendance = () => {
 
     useEffect(() => {
         const fetchattendance = async () => {
-            const res = await API.get('/classes/fetch-attendaces', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            setLoadError('')
+            try {
+                const res = await API.get('/classes/fetch-attendaces', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
 
-            if (res.data.success === true) {
-                const result = res.data.result || []
-                const selectedAttendance = result.find(
-                    (item) => item._id === id
-                )
+                if (res.data.success === true) {
+                    const result = res.data.result || []
+                    const selectedAttendance = result.find(
+                        (item) => item._id === id
+                    )
 
-                setAttendance(selectedAttendance || null)
+                    setAttendance(selectedAttendance || null)
+                    if (!selectedAttendance) setLoadError('Attendance record not found.')
+                }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
             }
         }
 
         if (token && id) fetchattendance()
     }, [token, id])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     if (!attendance) {
         return (

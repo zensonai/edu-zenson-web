@@ -4,6 +4,7 @@ import API from '../../../../services/api'
 import UpdateUser from './UpdateUser'
 
 const ViewUser = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
     const token = localStorage.getItem('access_token')
     const [user, setUser] = useState('')
@@ -13,13 +14,19 @@ const ViewUser = () => {
 
     useEffect(() => {
         const fetchuser = async () => {
-            const res = await API.get(`/admin/user/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            if (res.data.success === true) {
-                setUser(res.data.result)
+            setLoadError('')
+            try {
+                const res = await API.get(`/admin/user/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                if (res.data.success === true) {
+                    setUser(res.data.result)
+                }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
             }
         }
         if (token) fetchuser()
@@ -55,6 +62,14 @@ const ViewUser = () => {
     useEffect(() => {
         setAuditPage(1)
     }, [auditSearch, auditFilter])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-full w-full bg-white">

@@ -5,6 +5,7 @@ import API from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 
 const ViewMyPayment = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
     const token = localStorage.getItem('access_token')
     const [mypayments, setMypayments] = useState('')
@@ -13,23 +14,37 @@ const ViewMyPayment = () => {
 
     useEffect(() => {
         const fetchmypayment = async () => {
-            const res = await API.get(`/payment/fetch-my-payment/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            setLoadError('')
+            try {
+                const res = await API.get(`/payment/fetch-my-payment/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
 
-            if (res.data.success === true) {
-                setMypayments(res.data.result[0])
+                if (res.data.success === true) {
+                    setMypayments(res.data.result[0])
 
-                if (auth?.user?.role === "INSTITUTE_ADMIN") {
-                    setPlanpayments(res.data.result.slice(1))
+                    if (auth?.user?.role === "INSTITUTE_ADMIN") {
+                        setPlanpayments(res.data.result.slice(1))
+                    }
                 }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
             }
         }
 
         if (token) fetchmypayment()
     }, [token, id, auth?.user?.role])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     if (!mypayments) {
         return (

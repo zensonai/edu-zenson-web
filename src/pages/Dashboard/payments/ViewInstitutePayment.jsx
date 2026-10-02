@@ -6,6 +6,7 @@ import UpdateInstitutePayment from './UpdateInstitutePayment'
 import CreateRollbackReqeust from './CreateRollbackReqeust'
 
 const ViewInstitutePayment = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
     const token = localStorage.getItem('access_token')
     const [payment, setPayment] = useState([])
@@ -13,14 +14,20 @@ const ViewInstitutePayment = () => {
 
     useEffect(() => {
         const fetchpaymentbyID = async () => {
-            const res = await API.get(`/payment/institute-payment-recode/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-            })
+            setLoadError('')
+            try {
+                const res = await API.get(`/payment/institute-payment-recode/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                })
 
-            if (res.data.success === true) {
-                setPayment(res.data.result)
+                if (res.data.success === true) {
+                    setPayment(res.data.result)
+                }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
             }
         }
 
@@ -42,6 +49,14 @@ const ViewInstitutePayment = () => {
 
         if (token) fetchrollbackrequests()
     }, [token, id])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     if (!payment || payment.length === 0) {
         return (

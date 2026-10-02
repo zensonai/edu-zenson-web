@@ -4,6 +4,7 @@ import { FaBookOpen, FaClock, FaUsers, FaChalkboardUser } from 'react-icons/fa6'
 import API from '../../../../services/api'
 
 const ViewMyClass = () => {
+    const [loadError, setLoadError] = useState('')
     const { id } = useParams()
 
     const token = localStorage.getItem('access_token')
@@ -11,19 +12,33 @@ const ViewMyClass = () => {
 
     useEffect(() => {
         const fetchclass = async () => {
-            const res = await API.get(`/classes/fetch-teacherclass-byid/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            setLoadError('')
+            try {
+                const res = await API.get(`/classes/fetch-teacherclass-byid/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
 
-            if (res.data.success === true) {
-                setViewClass(res.data.result)
+                if (res.data.success === true) {
+                    setViewClass(res.data.result)
+                }
+            } catch (err) {
+                const message = err.response?.data?.message
+                setLoadError(Array.isArray(message) ? message.join(' ') : message || 'Unable to load this record. Please try again.')
             }
         }
 
         if (token && id) fetchclass()
     }, [token, id])
+
+    if (loadError) {
+        return (
+            <div className="w-full bg-white p-4">
+                <p role="alert" className="text-sm text-slate-700">{loadError}</p>
+            </div>
+        )
+    }
 
     if (!viewclass) {
         return (

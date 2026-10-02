@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { FaArrowRight, FaBuildingColumns, FaShieldHalved, FaUsers } from 'react-icons/fa6'
 import { GoogleLogin } from '@react-oauth/google'
 import DefaultInput from '../../component/Form/DefaultInput';
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [loading, setLoading] = useState(false)
+    const loginPending = useRef(false)
     const [googleLoading, setGoogleLoading] = useState(false)
     const [toast, setToast] = useState(false)
     const { login } = useAuth()
@@ -23,6 +24,8 @@ const Login = () => {
 
     const headleLogin = async (e) => {
         e.preventDefault();
+        if (loginPending.current) return;
+        loginPending.current = true;
         setLoading(true)
 
         try {
@@ -50,6 +53,7 @@ const Login = () => {
             });
         }
         finally {
+            loginPending.current = false;
             setLoading(false)
         }
     }
@@ -112,7 +116,7 @@ const Login = () => {
             )}
 
             <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center justify-center">
-                <div className="grid w-full overflow-hidden bg-white shadow-[0_30px_90px_rgba(124,58,237,0.12)] lg:grid-cols-[0.95fr_1.05fr]">
+                <div className="grid w-full min-w-0 grid-cols-1 overflow-hidden bg-white shadow-[0_30px_90px_rgba(124,58,237,0.12)] lg:grid-cols-[0.95fr_1.05fr]">
 
                     <div className="relative hidden overflow-hidden bg-gradient-to-br from-violet-600 via-violet-500 to-cyan-500 p-10 lg:flex xl:p-14">
                         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10"></div>
@@ -198,9 +202,9 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <div className="flex min-h-[680px] items-center justify-center px-6 py-10 sm:px-10 lg:px-14 xl:px-20">
+                    <div className="flex min-w-0 min-h-[680px] items-center justify-center px-6 py-10 sm:px-10 lg:px-14 xl:px-20">
 
-                        <div className="w-full max-w-md">
+                        <div className="w-full min-w-0 max-w-md">
 
                             <div className="mb-10 lg:hidden">
                                 <div className="flex items-center gap-4">
@@ -278,6 +282,7 @@ const Login = () => {
                                     <DefaultButton
                                         type="submit"
                                         label={loading ? 'Signing in...' : 'Sign In'}
+                                        disabled={loading}
                                     />
                                 </div>
                             </form>
@@ -302,7 +307,6 @@ const Login = () => {
                                     text="signin_with"
                                     shape="rectangular"
                                     size="large"
-                                    width="400"
                                 />
                             </div>
 
