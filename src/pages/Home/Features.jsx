@@ -129,7 +129,7 @@ const Features = () => {
 
                     <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <a
-                            href="/signup"
+                            href="/register"
                             className="inline-flex w-full items-center justify-center gap-3 bg-violet-600 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:bg-violet-700 sm:w-auto"
                         >
                             Create Your Platform
@@ -186,10 +186,6 @@ const Features = () => {
                                         {feature.description}
                                     </p>
 
-                                    <div className="mt-6 flex items-center gap-2 text-xs font-bold text-violet-600 opacity-0 transition duration-300 group-hover:opacity-100">
-                                        Learn more
-                                        <FaArrowRight className="text-[10px]" />
-                                    </div>
                                 </div>
                             );
                         })}
@@ -344,7 +340,7 @@ const Features = () => {
 
                     <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <a
-                            href="/signup"
+                            href="/register"
                             className="inline-flex w-full items-center justify-center gap-3 bg-white px-7 py-3.5 text-sm font-bold text-violet-700 transition hover:bg-violet-50 sm:w-auto"
                         >
                             Create Your Platform

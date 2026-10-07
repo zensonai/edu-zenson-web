@@ -258,14 +258,6 @@ const Resources = () => {
                                 platform and start building your institution.
                             </p>
                         </div>
-
-                        <a
-                            href="#"
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 transition hover:text-violet-700"
-                        >
-                            View all resources
-                            <FaArrowRight className="text-xs" />
-                        </a>
                     </div>
 
                     <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -273,9 +265,7 @@ const Resources = () => {
                             const Icon = resource.icon;
 
                             return (
-                                <a
-                                    key={resource.title}
-                                    href={resource.href}
+                                <div
                                     className="group rounded-2xl bg-white p-6 shadow-sm ring-1 ring-violet-100 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                                 >
                                     <div className="flex items-center justify-between">
@@ -300,11 +290,7 @@ const Resources = () => {
                                         {resource.description}
                                     </p>
 
-                                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-violet-600 transition group-hover:gap-3">
-                                        Read guide
-                                        <FaArrowRight className="text-xs" />
-                                    </div>
-                                </a>
+                                </div>
                             );
                         })}
                     </div>
@@ -337,13 +323,6 @@ const Resources = () => {
                             platform.
                         </p>
 
-                        <a
-                            href="#documentation"
-                            className="mt-7 inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-cyan-600"
-                        >
-                            Explore Documentation
-                            <FaArrowRight className="text-xs" />
-                        </a>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -361,10 +340,6 @@ const Resources = () => {
                                     {link.description}
                                 </p>
 
-                                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-cyan-600 transition group-hover:gap-3">
-                                    Explore
-                                    <FaArrowRight className="text-xs" />
-                                </div>
                             </a>
                         ))}
                     </div>
