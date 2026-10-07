@@ -206,7 +206,7 @@ const Contact = () => {
                                     </p>
 
                                     <p className="mt-1 text-sm text-gray-500">
-                                        sales@zensonedu.com
+                                        <a href="https://zenson.ai" target="_blank">https://zenson.ai</a>
                                     </p>
                                 </div>
                             </div>
