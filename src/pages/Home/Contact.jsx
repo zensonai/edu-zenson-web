@@ -4,15 +4,15 @@ import {
     FaBrain,
     FaBuilding,
     FaCheck,
-    FaCircleQuestion,
     FaEnvelope,
     FaGraduationCap,
     FaHeadset,
-    FaLocationDot,
     FaPhone,
     FaRobot,
     FaShieldHalved,
 } from "react-icons/fa6";
+
+const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
 const contactOptions = [
     {
@@ -63,6 +63,10 @@ const Contact = () => {
         message: "",
     });
 
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState("");
+
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -72,13 +76,47 @@ const Contact = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        setLoading(true);
+        setSuccess(false);
+        setError("");
+
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || "Failed to send enquiry");
+            }
+
+            setSuccess(true);
+
+            setFormData({
+                name: "",
+                email: "",
+                institution: "",
+                phone: "",
+                students: "",
+                interest: "",
+                message: "",
+            });
+        } catch (error) {
+            setError(
+                "Unable to send your enquiry right now. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <main className="min-h-screen bg-white">
-
             <section className="relative overflow-hidden bg-violet-50/60 px-5 pb-20 pt-20 sm:px-6 lg:px-8 lg:pb-28 lg:pt-28">
                 <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-violet-200/50 blur-3xl" />
 
@@ -141,7 +179,6 @@ const Contact = () => {
 
             <section className="bg-violet-50/40 px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
                 <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-
                     <div>
                         <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-600">
                             Talk to us
@@ -241,6 +278,19 @@ const Contact = () => {
                             </p>
                         </div>
 
+                        {success && (
+                            <div className="mt-6 border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                                Your enquiry has been sent successfully. Our
+                                team will get back to you soon.
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                                {error}
+                            </div>
+                        )}
+
                         <form
                             onSubmit={handleSubmit}
                             className="mt-8 space-y-5"
@@ -327,15 +377,19 @@ const Contact = () => {
                                         <option value="">
                                             Select student count
                                         </option>
+
                                         <option value="up-to-500">
                                             Up to 500
                                         </option>
+
                                         <option value="500-3000">
                                             500–3,000
                                         </option>
+
                                         <option value="3000-plus">
                                             3,000+
                                         </option>
+
                                         <option value="multiple-campuses">
                                             Multiple campuses
                                         </option>
@@ -357,21 +411,27 @@ const Contact = () => {
                                         <option value="">
                                             Select an option
                                         </option>
+
                                         <option value="platform">
                                             Education Platform
                                         </option>
+
                                         <option value="demo">
                                             Platform Demo
                                         </option>
+
                                         <option value="ai">
                                             AI / LLM / RAG
                                         </option>
+
                                         <option value="enterprise">
                                             Enterprise Solution
                                         </option>
+
                                         <option value="integration">
                                             Custom Integration
                                         </option>
+
                                         <option value="support">
                                             General Enquiry
                                         </option>
@@ -397,10 +457,14 @@ const Contact = () => {
 
                             <button
                                 type="submit"
-                                className="inline-flex w-full items-center justify-center gap-3 bg-violet-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:bg-violet-700"
+                                disabled={loading}
+                                className="inline-flex w-full items-center justify-center gap-3 bg-violet-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                Send Enquiry
-                                <FaArrowRight className="text-xs" />
+                                {loading ? "Sending..." : "Send Enquiry"}
+
+                                {!loading && (
+                                    <FaArrowRight className="text-xs" />
+                                )}
                             </button>
                         </form>
                     </div>
@@ -410,7 +474,6 @@ const Contact = () => {
             <section className="px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
                 <div className="mx-auto max-w-7xl">
                     <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-
                         <div>
                             <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-600">
                                 Why ZensonEdu
@@ -449,7 +512,6 @@ const Contact = () => {
 
             <section className="px-5 pb-20 sm:px-6 lg:px-8 lg:pb-24">
                 <div className="mx-auto max-w-5xl bg-gradient-to-r from-violet-600 to-cyan-500 px-7 py-12 text-center shadow-2xl shadow-violet-200 sm:px-12 lg:py-16">
-
                     <div className="mx-auto flex h-14 w-14 items-center justify-center bg-white/15 text-white">
                         <FaRobot className="text-xl" />
                     </div>
@@ -459,9 +521,10 @@ const Contact = () => {
                     </h2>
 
                     <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-                        Explore how LLMs, vector search, and retrieval-augmented
-                        generation can turn your institution's resources into
-                        an intelligent knowledge platform.
+                        Explore how LLMs, vector search, and
+                        retrieval-augmented generation can turn your
+                        institution's resources into an intelligent knowledge
+                        platform.
                     </p>
 
                     <a
@@ -473,7 +536,6 @@ const Contact = () => {
                     </a>
                 </div>
             </section>
-
         </main>
     );
 };
